@@ -48,6 +48,29 @@ class BackPropagationNetwork:
             self._layerOutput.append(self.sgm(layerInput))
         return self._layerOutput[-1].T
 
+    #
+    # TrainEpoch method
+    #
+    def TrainEpoch(self, input, target, trainingRate = 0.2):
+        """ This method trains the network for one epoch """
+        delta = []
+        lnCases = input.shape[0]
+
+        # First run the network
+        self.Run(input)
+
+        # Calculate our deltas
+        for index in reversed(range(self.layerCount)):
+            if index == self.layerCount - 1:
+                # Compare to the target values
+                output_delta = self._layerOutput[index] - target.T
+                error = np.sum(output_delta ** 2)
+                delta.append(output_delta Ü self.sgm(self._layerInput[index], True))
+            else:
+                # Compare to the following layer's delta
+                delta_pullback = self.weights[index + 1].T.dot(delta[-1])
+                delta.append(delta_pullback[:-1, :] * self.sgm(self._layerInput[index], True))
+
     # Transfer function
     def sgm(self, x, Derivate = False):
         if not Derivate:
